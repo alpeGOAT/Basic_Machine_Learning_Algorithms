@@ -1,1 +1,108 @@
 
+import pandas as pd
+import numpy as np
+from mlxtend.frequent_patterns import association_rules
+from mlxtend.frequent_patterns import apriori
+from mlxtend.preprocessing import TransactionEncoder
+
+df = pd.read_csv('steam-200k.csv', header=None)
+df.columns = ["user_id", "game", "behavior", "version", "unused"]
+
+print("First 5 Games: ")
+print(df.head())
+print("\n")
+
+print("Game Dataset Information: ")
+print(df.info())
+print("\n")
+
+# only take purchased games to make it easier to understand
+df = df[df["behavior"] == "purchase"]
+df = df.dropna(subset=["game"]) # drops if game column empty
+
+print("Cleaned Data: ")
+print(df.head())
+print("\n")
+
+basket = df.groupby("user_id")["game"].apply(list).reset_index()
+print("Basket Data:")
+print(basket.head())
+print("\n")
+
+transactions = basket["game"].tolist()
+transactions = [list(set(transaction)) for transaction in transactions] # removes duplicate games
+transactions = [transaction for transaction in transactions if len(transaction) > 1] # remove if user only bought 1 game
+print("First 10 Transactions: ")
+print(transactions[:10])
+print("\n")
+
+te = TransactionEncoder() # Converts transactions into True / False format
+te_array = te.fit(transactions).transform(transactions)
+
+df_encoded = pd.DataFrame(te_array,columns=te.columns_)
+
+frequent_items = apriori(df_encoded, min_support=0.02, use_colnames=True)
+print("Frequent Items Data: ")
+print(frequent_items.head())
+print("\n")
+
+print("Total Frequent Itemsets: ")
+print(frequent_items.shape[0]) # total number of rows
+print("\n")
+
+rules = association_rules(frequent_items, metric="confidence", min_threshold=0.4)
+
+rules = rules.sort_values(by="lift", ascending=False)
+
+rules["antecedents_text"] = rules["antecedents"].apply(lambda x: ", ".join(list(x)))
+rules["consequents_text"] = rules["consequents"].apply(lambda x: ", ".join(list(x)))
+
+rules["rule"] = rules["antecedents_text"] + "-->" + rules["consequents_text"]
+
+pd.set_option("display.max_colwidth", None)
+pd.set_option("display.width", 2000)
+
+rules = rules[~rules["rule"].str.contains("DLC", case=False, na=False)] # dont take DLC Games Seriously
+rules = rules[~rules["rule"].str.contains("Deleted Scenes", case=False, na=False)]
+rules = rules[~rules["rule"].str.contains("Test Server", case=False, na=False)]
+
+rules_clean = rules[["rule","support","confidence","lift"]]
+
+print("Top Association Rules:")
+print(rules_clean.head(15).to_string(index=False))
+print("\n")
+
+# --------------------------------------------------------------------------------------------------------------
+
+def recommend_game(game_name, rules_df, top_n = 5):
+    recommendations = []
+
+    for index, row in rules_df.iterrows():
+        antecedents = list(row["antecedents"])
+        consequents = list(row["consequents"])
+
+        if game_name in antecedents:
+            for game in consequents:
+                recommendations.append({"Recommended Game":game, "Based On":game_name, "Confidence":row["confidence"],
+                                        "Lift":row["lift"]})
+
+    recommendations_df = pd.DataFrame(recommendations)
+
+    if recommendations_df.empty:
+        print("No Recommendations Found")
+        return
+    else:
+        recommendations_df = recommendations_df.sort_values(by=["Lift", "Confidence"], ascending=False)
+
+    print("\n")
+
+    print("\nRecommended games based on:", game_name)
+    print("-" * 70)
+    for index, row in recommendations_df.head(top_n).iterrows():
+        print("Recommended Game:", row["Recommended Game"])
+        print("Confidence:",row["Confidence"])
+        print("Lift:",row["Lift"])
+        print("-" * 70)
+
+x = input("Enter The Game You Want To Buy : ")
+recommend_game(x,rules,5)
