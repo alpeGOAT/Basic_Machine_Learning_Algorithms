@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score
 mydb = mysql.connector.connect(
     host="localhost",
     user="root",
-    passwd= "alperen31",
+    passwd= "your_password",
     port= 3306,
     database= "printerworld"
 )
