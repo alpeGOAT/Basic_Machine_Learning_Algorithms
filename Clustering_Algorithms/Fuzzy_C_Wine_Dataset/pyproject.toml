@@ -1,0 +1,10 @@
+[project]
+name = "fuzzy-c-wine-dataset"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "matplotlib>=3.11.0",
+    "scikit-fuzzy>=0.5.0",
+    "scikit-learn>=1.9.0",
+    "scipy>=1.18.0",
+]
