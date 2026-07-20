@@ -70,7 +70,7 @@ df_behaviour = df.copy()
 df_behaviour = df_behaviour[["daily_listening_minutes", "playlists_count",
     "skip_rate_pct" ,"discover_weekly_user", "uses_offline_mode", "podcasts_too"]]
 
-# makem sure every column is numerical
+# make sure every column is numerical
 df_behaviour[["discover_weekly_user", "uses_offline_mode", "podcasts_too"]] = df_behaviour[["discover_weekly_user", "uses_offline_mode",
                                                                                             "podcasts_too"]].astype(int)
 
