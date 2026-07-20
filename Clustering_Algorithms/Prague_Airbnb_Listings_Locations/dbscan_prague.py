@@ -49,7 +49,7 @@ print("\n")
 
 coordinates = df[["latitude", "longitude"]].to_numpy() # creates a numPy array from latitude, longitude rows
 
-print("Coordinate Date:")
+print("Coordinate Data:")
 print(coordinates[:5])
 print("\n")
 
