@@ -1,0 +1,2 @@
+You can download the dataset from link: https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce
+I used olist_geolocation dataset
