@@ -1,0 +1,10 @@
+[project]
+name = "k-modes-with-car-dataset"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "kmodes>=0.12.2",
+    "matplotlib>=3.11.1",
+    "pandas>=3.0.3",
+    "pandas-stubs~=3.0.3",
+]
