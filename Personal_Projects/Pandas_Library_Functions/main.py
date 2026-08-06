@@ -384,10 +384,3 @@ print("\n")
 # save main dataset
 video_game.to_csv('Video Games List.csv', index=False)
 print("\n")
-
-
-
-
-
-
-
